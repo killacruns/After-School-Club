@@ -150,9 +150,95 @@
               >
                 Remove
               </button>
-              
-              <div>
-              </div>
+              <!--Checkout Area-->
+              <div
+              class = "flex flex-col items-center justify-center h-screen">
+              <div class = "bg-white p-8 rounded-lg shadow-md w-96">
+                <h1 class = "font-bold text 2xl mb-4">Checkout</h1>
+
+                <div class= "space-y-4">
+                  <div>
+                    <label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
+                    <input
+                     type="text"
+                     id="firstName"
+                     class="mt-1 p-2 border border-gray-300 rounded-md w-full"
+                     placeholder="Please enter your first name"
+                     v-model="order.firstName"
+                     />
+                     </div>
+
+                     <div>
+                      <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
+                      <input
+                      type = "text"
+                      id="lastName"
+                      class="mt-1 p-2 border border-gray-300 rounded-md w-full"
+                      placeholder="Please enter your last name"
+                      v-model="order.lastName"
+                      />
+                      </div>
+
+                      <div>
+                        <label for="addresss" class="block text-sm font-medium text-gray-700">Address</label>
+                        <input
+                         type="text"
+                         id="address"
+                         class="mt-1 p-2 border border-gray-300 rounded-md w-full"
+                         placeholder="Please enter your address"
+                         v-model="order.address"
+                        />
+                        </div>
+
+                        <div>
+                          <label for="city" class="block text-sm font-medium text-gray-700">City</label>
+                          <input
+                          type="text"
+                          id="city"
+                          class="mt-1 p-2 border border-gray-300 rounded-md w-full"
+                          placeholder="Enter your city"
+                          v-model="order.city"
+                          />
+                          </div>
+
+                          <div>
+                            <label for="state" class="block text-sm font-medium text-gray-700">State</label>
+                            <select
+                            id="state"
+                            v-model="order.state"
+                            class="mt-1 p-2 border border-gray-300 rounded-md w-full"
+                            aria-label="Select your state"
+                            >
+                            <option disabled value="">Select your state</option>
+                            <option v-for="(state, key) in states" :value="state" :key="key">
+                              {{key}}
+                            </option>
+                            </select>
+                            </div>
+
+                            <div>
+                              <label class="font-semibold text-gray-700">Shippping Method</label>
+                              <input
+                              type="radio"
+                              id="home"
+                              name="shipping"
+                              value="home"
+                              class="mr-2"
+                              v-model="method"
+                              />
+                             <label for="home" class="text-gray-700">Home</label>
+                             <input
+                             type="radio"
+                             id="business"
+                             name="shipping"
+                             value="business"
+                             class="ml-4 mr-2"
+                             v-model="method"
+                             />
+                             <label for="business" class="text-gray-700">Business</label>
+                             </div>                             
+                </div>
+            </div>
             </div>
           </div>
         </div>
@@ -251,6 +337,19 @@
             },
           ],
           cart: [],
+          order: {
+            firstName: "",
+            lastName: "",
+            address: "",
+            city: "",
+            state: ""
+          },
+          method: "",
+          states: {
+            "AL": "Alabama",
+            "AK": "Alaska",
+            // Add more states as needed
+          }
         },
         // methods below.
         methods: {
@@ -322,5 +421,4 @@
             });
           },
         },
-      });    </script>  </body>
-</html>
+      });    </script>  </body></html>
