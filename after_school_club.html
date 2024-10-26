@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AfterSchoolClub</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <!-- header section -->
+      <header>
+        <div class="flex items-center justify-between">
+          <a href="#app">
+            <h1 class="font-bold text-3xl m-4 text-black">AfterSchoolClub</h1></a
+          >
+          <button
+            v-if="!isCartEmpty"
+            v-on:click="showCheckOut"
+            class="border-none rounded bg-green-600 text-white font-semibold p-2 m-4"
+          >
+            {{cartItemCount}}
+            <span>
+              <i class="fa fa-cart-plus" aria-hidden="true"></i> Cart</span
+            >
+          </button>
+        </div>
+      </header>
+
+      <!-- search functionality and sort -->
+      <div v-if="showProduct">
+        <div class="flex justify-between items-center mt-12 space-x-2 m-24">
+          <div class="space-x-8">
+            <label class="font-bold" for="sort">Sort By: </label>
+            <select
+              id="sort"
+              class="border rounded-lg p-2 w-48"
+              v-model="sortCriteria"
+              @change="sortLessons"
+              aria-label="Sort criteria"
+            >
+              <option value="name">Name</option>
+              <option value="location">Location</option>
+              <option value="price">Price</option>
+            </select>
+            <select
+              id="order"
+              class="border rounded-lg p-2 w-48"
+              v-model="sortOrder"
+              @change="sortLessons"
+              aria-label="Sort order"
+            >
+              <option value="ascending">ascending</option>
+              <option value="descending">descending</option>
+            </select>
+          </div>
+
+          <div>
+            <input
+              type="text"
+              placeholder="Search for lessons..."
+              class="border-gray-300 rounded-lg border-2 p-2 w-96"
+              v-model="searchQuery"
+            />
+            <button
+              class="bg-red-500 text-white font-bold h-10 w-24 rounded-lg"
+            >
+              Search
+            </button>
+          </div>
+        </div>
+        <!-- ends here  -->
+
+        <!-- lessons  -->
+
+        <div class="grid sm:grid-cols-1 md:grid-cols-3 gap-4 m-24">
+          <!-- Loop through Lessons and display -->
+          <div
+            class="border border-solid shadow-md m-2 w-auto p-12 rounded-lg"
+            v-for="(lesson, index) in filterItems"
+            :key="index"
+          >
+            <img
+              :src="lesson.images"
+              alt="..."
+              class="w-full h-48 object-cover rounded-lg mb-2"
+            />
+            <p class="font-bold text-xl mb-2 mt-4">{{lesson.subject}}</p>
+            <p class="font-semibold text-gray-600">
+              Location : {{lesson.location}}
+            </p>
+            <p class="font-semibold text-gray-600">Price : ${{lesson.price}}</p>
+            <p class="font-semibold text-gray-600">
+              Spaces : {{lesson.spaces}}
+            </p>
+
+            <button
+              v-on:click="addToCart(index)"
+              v-if="lesson.spaces > 0"
+              class="border-none rounded bg-blue-600 text-white font-semibold p-2 mt-4"
+            >
+              add To Cart
+            </button>
+            <button
+              disabled="disabled"
+              class="border-none rounded bg-blue-500 text-white font-semibold p-2 mt-4"
+              v-else
+            >
+              No spaces Left
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- show the cart page. -->
+      <div v-else>
+        <h1 class="text-center mt-8 font-bold text-4xl">Cart Lessons</h1>
+        <div class="grid sm:grid-cols-1 md:grid-cols-3 gap-4 m-24">
+          <!-- Loop through Lessons and display -->
+          <div
+            v-for="(lesson, index) in cart"
+            :key="index"
+            class="border border-solid shadow-md m-2 w-auto p-12 rounded-lg"
+          >
+            <p class="font-bold text-xl mb-2 mt-4">
+              Lesson: {{lesson.subject}}
+            </p>
+            <p class="font-semibold text-gray-600">
+              Location: {{lesson.location}}
+            </p>
+            <p class="font-semibold text-gray-600">Price: {{lesson.price}}</p>
+            <p class="font-semibold text-gray-600">
+              Available Spaces : {{lesson.spaces}}
+            </p>
+
+            <div class="flex space-x-8">
+              <button
+                class="rounded text-white bg-green-600 font-semibold p-2 mt-4"
+              >
+                check Out
+              </button>
+              <button
+                v-on:click="removeFromList(index)"
+                class="rounded text-white bg-red-600 font-semibold p-2 mt-4"
+              >
+                Remove
+              </button>
+              
+              <div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- script -->
+    <script type="text/javascript">
+      var app = new Vue({
+        el: "#app",
+        data: {
+          showProduct: true,
+          sortOrder: "ascending",
+          sortCriteria: "name",
+          searchQuery: "",
+          lessons: [
+            {
+              id: 1,
+              subject: "Badminton",
+              location: "Koln",
+              price: 150,
+              spaces: 5,
+              images: "images/badminton.jpg",
+            },
+            {
+              id: 2,
+              subject: "Boardgames",
+              location: "Manchester",
+              price: 145,
+              spaces: 5,
+              images: "images/boardgames.jpg",
+            },
+            {
+              id: 3,
+              subject: "Chess",
+              location: "British Colombia",
+              price: 180,
+              spaces: 5,
+              images: "images/chess.jpg",
+            },
+            {
+              id: 4,
+              subject: "Choir",
+              location: "Bordeaux",
+              price: 200,
+              spaces: 5,
+              images: "images/choir.jpg",
+            },
+            {
+              id: 5,
+              subject: "English",
+              location: "London",
+              price: 350,
+              spaces: 5,
+              images: "images/english.jpg",
+            },
+            {
+              id: 6,
+              subject: "Film",
+              location: "New York",
+              price: 325,
+              spaces: 5,
+              images: "images/film.jpg",
+            },
+            {
+              id: 7,
+              subject: "French",
+              location: "Lyon",
+              price: 80,
+              spaces: 5,
+              images: "images/french.jpg",
+            },
+            {
+              id: 8,
+              subject: "Gymnastics",
+              location: "Hong Kong",
+              price: 550,
+              spaces: 5,
+              images: "images/gymnastics.jpg",
+            },
+            {
+              id: 9,
+              subject: "Mathematics",
+              location: "Nairobi",
+              price: 245,
+              spaces: 5,
+              images: "images/mathematics.jpg",
+            },
+            {
+              id: 10,
+              subject: "Swimming",
+              location: "Kilifi",
+              price: 600,
+              spaces: 5,
+              images: "images/swimming.jpg",
+            },
+          ],
+          cart: [],
+        },
+        // methods below.
+        methods: {
+          addToCart: function (index) {
+            if (this.lessons[index].spaces > 0) {
+              this.cart.push(this.lessons[index]);
+              this.lessons[index].spaces--;
+            } else {
+              alert("No more spaces for this lesson");
+            }
+          },
+          showCheckOut: function () {
+            if (this.cart.length > 0) {
+              this.showProduct = !this.showProduct;
+            }
+          },
+          removeFromList: function (index) {
+            const removedItem = this.cart[index];
+            if (removedItem) {
+              const originalLesson = this.lessons.find(
+                (lesson) => lesson.id === removedItem.id
+              );
+              if (originalLesson) {
+                originalLesson.spaces++;
+              }
+            }
+
+            this.cart = this.cart.filter((item, i) => {
+              return i != index;
+            });
+          },
+
+          // sorting method.
+          sortLessons: function () {
+            const modifier = this.sortOrder == "ascending" ? 1 : -1;
+
+            this.lessons.sort((a, b) => {
+              if (this.sortCriteria === "name") {
+                return modifier * a.subject.localeCompare(b.subject);
+              } else if (this.sortCriteria === "location") {
+                return modifier * a.location.localeCompare(b.location);
+              } else if (this.sortCriteria === "price") {
+                return modifier * (a.price - b.price);
+              }
+            });
+          },
+        },
+        // computed methods.
+        computed: {
+          cartItemCount: function () {
+            return this.cart.length || "";
+          },
+          // check if the cart is empty.
+
+          isCartEmpty: function () {
+            return this.cart.length === 0;
+          },
+          // search Query functionality.
+
+          filterItems() {
+            return this.lessons.filter((lesson) => {
+              const lowerCaseQuery = this.searchQuery.toLowerCase();
+
+              return (
+                lesson.subject.toLowerCase().includes(lowerCaseQuery) ||
+                lesson.location.toLowerCase().includes(lowerCaseQuery) ||
+                lesson.price.toString().includes(lowerCaseQuery)
+              );
+            });
+          },
+        },
+      });    </script>  </body>
+</html>
