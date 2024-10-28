@@ -29,6 +29,14 @@
               <i class="fa fa-cart-plus" aria-hidden="true"></i> Cart</span
             >
           </button>
+          <button
+            v-else
+            disabled="disabled"
+            class="border-none rounded bg-green-600 text-white font-semibold p-2 m-4"
+            aria-label="Cart is empty"
+          >
+            Cart is empty
+          </button>
         </div>
       </header>
 
@@ -69,6 +77,7 @@
             />
             <button
               class="bg-red-500 text-white font-bold h-10 w-24 rounded-lg"
+              aria-label="Search"
             >
               Search
             </button>
@@ -87,7 +96,7 @@
           >
             <img
               :src="lesson.images"
-              alt="..."
+              :alt="lesson.subject"
               class="w-full h-48 object-cover rounded-lg mb-2"
             />
             <p class="font-bold text-xl mb-2 mt-4">{{lesson.subject}}</p>
@@ -103,13 +112,15 @@
               v-on:click="addToCart(index)"
               v-if="lesson.spaces > 0"
               class="border-none rounded bg-blue-600 text-white font-semibold p-2 mt-4"
+              :aria-label="'Add ' + lesson.subject + ' to cart'"
             >
-              add To Cart
+              add To Cart <span><i class="fa fa-plus-circle" aria-hidden="true"></i></span>
             </button>
             <button
               disabled="disabled"
               class="border-none rounded bg-blue-500 text-white font-semibold p-2 mt-4"
               v-else
+              aria-label="No spaces left"
             >
               No spaces Left
             </button>
@@ -141,149 +152,146 @@
             <div class="flex space-x-8">
               <button
                 class="rounded text-white bg-green-600 font-semibold p-2 mt-4"
+                aria-label="Proceed to checkout"
               >
                 check Out
               </button>
               <button
                 v-on:click="removeFromList(index)"
-                class="border-none bg-red-500  text-white p-2 text-red rounded-lg font-semibold"
+                class="rounded text-white bg-red-600 font-semibold p-2 mt-4"
+                :aria-label="'Remove ' + lesson.subject + ' from cart'"
               >
                 Remove
               </button>
+            </div>
               <!--Checkout Area-->
-              <div
-              class = "flex flex-col items-center justify-center h-screen">
-              <div class = "bg-white p-8 rounded-lg shadow-md w-9">
-                <h1 class = "font-bold text 2xl mb-4">Checkout</h1>
+               <!-- User Information Form -->
+      <div class="space-y-4">
+        <div>
+          <label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
+          <input
+            type="text"
+            id="firstName"
+            class="mt-1 p-2 border border-gray-300 rounded-md w-full"
+            placeholder="Please enter your first name"
+            v-model="order.firstName"
+          />
+        </div>
 
-                <div class= "space-y-4">
-                  <div>
-                    <label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
-                    <input
-                     type="text"
-                     id="firstName"
-                     class="mt-1 p-2 border border-gray-300 rounded-md w-full"
-                     placeholder="Please enter your first name"
-                     v-model="order.firstName"
-                     />
-                     </div>
+        <div>
+          <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
+          <input
+            type="text"
+            id="lastName"
+            class="mt-1 p-2 border border-gray-300 rounded-md w-full"
+            placeholder="Please enter your last name"
+            v-model="order.lastName"
+          />
+        </div>
 
-                     <div>
-                      <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
-                      <input
-                      type = "text"
-                      id="lastName"
-                      class="mt-1 p-2 border border-gray-300 rounded-md w-full"
-                      placeholder="Please enter your last name"
-                      v-model="order.lastName"
-                      />
-                      </div>
+        <div>
+          <label for="address" class="block text-sm font-medium text-gray-700">Address</label>
+          <input
+            type="text"
+            id="address"
+            class="mt-1 p-2 border border-gray-300 rounded-md w-full"
+            placeholder="Please enter your address"
+            v-model="order.address"
+          />
+        </div>
 
-                      <div>
-                        <label for="addresss" class="block text-sm font-medium text-gray-700">Address</label>
-                        <input
-                         type="text"
-                         id="address"
-                         class="mt-1 p-2 border border-gray-300 rounded-md w-full"
-                         placeholder="Please enter your address"
-                         v-model="order.address"
-                        />
-                        </div>
+        <div>
+          <label for="city" class="block text-sm font-medium text-gray-700">City</label>
+          <input
+            type="text"
+            id="city"
+            class="mt-1 p-2 border border-gray-300 rounded-md w-full"
+            placeholder="Enter your city"
+            v-model="order.city"
+          />
+        </div>
 
-                        <div>
-                          <label for="city" class="block text-sm font-medium text-gray-700">City</label>
-                          <input
-                          type="text"
-                          id="city"
-                          class="mt-1 p-2 border border-gray-300 rounded-md w-full"
-                          placeholder="Enter your city"
-                          v-model="order.city"
-                          />
-                          </div>
+        <div>
+          <label for="state" class="block text-sm font-medium text-gray-700">State</label>
+          <select
+            id="state"
+            v-model="order.state"
+            class="mt-1 p-2 border border-gray-300 rounded-md w-full"
+            aria-label="Select your state"
+          >
+            <option disabled value="">Select your state</option>
+            <option v-for="(state, key) in states" :value="state" :key="key">
+              {{ key }}
+            </option>
+          </select>
+        </div>
 
-                          <div>
-                            <label for="state" class="block text-sm font-medium text-gray-700">State</label>
-                            <select
-                            id="state"
-                            v-model="order.state"
-                            class="mt-1 p-2 border border-gray-300 rounded-md w-full"
-                            aria-label="Select your state"
-                            >
-                            <option disabled value="">Select your state</option>
-                            <option v-for="(state, key) in states" :value="state" :key="key">
-                              {{key}}
-                            </option>
-                            </select>
-                            </div>
+        <div class="mt-4">
+          <label class="block font-semibold text-gray-700 mb-2">Shipping Method</label>
+          <div class="flex items-center space-x-4">
+            <div class="flex items-center">
+              <input
+                type="radio"
+                id="home"
+                name="shipping"
+                value="home"
+                class="mr-2"
+                v-model="order.method"
+              />
+              <label for="home" class="text-gray-700">Home</label>
+            </div>
+            <div class="flex items-center">
+              <input
+                type="radio"
+                id="business"
+                name="shipping"
+                value="business"
+                class="mr-2"
+                v-model="order.method"
+              />
+              <label for="business" class="text-gray-700">Business</label>
+            </div>
+          </div>
+        </div>
 
-                            <div>
-                              <label class="font-semibold text-gray-700">Shippping Method</label>
-                              <input
-                              type="radio"
-                              id="home"
-                              name="shipping"
-                              value="home"
-                              class="mr-2"
-                              v-model="method"
-                              />
-                             <label for="home" class="text-gray-700">Home</label>
-                             <input
-                             type="radio"
-                             id="business"
-                             name="shipping"
-                             value="business"
-                             class="ml-4 mr-2"
-                             v-model="method"
-                             />
-                             <label for="business" class="text-gray-700">Business</label>
-                             </div>
-                             <!--Button for order summary-->
-                             <button
-                             @click ="showModal = true"
-                             class="bg-red-500 text-white p-2 rounded"
-                             >
-                             View order Summary
-                            </button>     
-                            <!--Modal Background-->
-                            <div
-                            v-if="showModal"
-                            class="fixed inset-0 bg-gray bg-opacity-30 flex justify-center items-center z-50"
-                            >
-                            <!--Modal Content-->
-                            <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
-                              <!--Close button-->
-                              <button
-                              @click="showModal = false"
-                              class="float-right text-gray-700 hover:text-gray-900"
-                              >
-                              &times;
-                              </button>
-                              <h2 class ="font-bold text -2xl mb-2">Order Summary</h2>
-                              <p>
-                                <strong>First Name: {{ order.firstName }}</strong>
-                                <span id="displayFirstName"></span>
-                              </p>
-                              <p class="mt-2"></p>
-                              <strong>Last Name: {{ order.lastName }}</strong>
-                              <span id="displayLastName"></span>
-                              </p>
-                              <p class="mt-2">
-                                <strong>Address: {{ order.address }}</strong>
-                                <span id="displayAddress"></span>
-                                </p>
-                                <p class="mt-2">
-                                  <strong>City: {{ order.city }}</strong>
-                                  <span id="displayCity"></span>
-                                  </p>
-                                  <p class="mt-2">
-                                    <strong>State: {{ order.state }}</strong>
-                                    <span id="displayState"></span>
-                                  </p>
-                                    <p class="mt-2">
-                                      <strong>Order: {{ order.method }}</strong>
-                                      <span id="displayOrder"></span>
-                                      </p>
-                          </div>                        
+        <!-- Button for order summary -->
+        <button
+          @click="showModal = true"
+          class="bg-red-500 text-white px-6 py-2 rounded mt-4 w-full sm:w-auto"
+        >
+          View Order Summary
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Background -->
+    <div
+      v-if="showModal"
+      class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50 p-4"
+    >
+      <!-- Modal Content -->
+      <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+        <!-- Close button -->
+        <button
+          @click="showModal = false"
+          class="float-right text-gray-700 hover:text-gray-900"
+          aria-label="Close modal"
+        >
+          ×
+        </button>
+        <h2 class="font-bold text-2xl mb-2">Order Summary</h2>
+        <p><strong>Lesson:</strong> {{ cartItem }}</p>
+        <p><strong>First Name:</strong> {{ order.firstName }}</p>
+        <p class="mt-2"><strong>Last Name:</strong> {{ order.lastName }}</p>
+        <p class="mt-2"><strong>Address:</strong> {{ order.address }}</p>
+        <p class="mt-2"><strong>City:</strong> {{ order.city }}</p>
+        <p class="mt-2"><strong>State:</strong> {{ order.state }}</p>
+        <p class="mt-2"><strong>Shipping Method:</strong> {{ order.method }}</p>
+      </div>
+    </div>
+  </section>
+</div>
+                      
                 </div>
             </div> 
             </div>
@@ -387,6 +395,5 @@
           },
         },
       });    
-      </script>  
-      </body>
+      </script>        </body>
       </html>
