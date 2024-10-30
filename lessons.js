@@ -5,6 +5,7 @@ let lessons =  [
       location: "Koln",
       price: 150,
       spaces: 5,
+      ratings: 5,
       images: "images/badminton.jpg",
     },
     {
@@ -13,6 +14,7 @@ let lessons =  [
       location: "Manchester",
       price: 145,
       spaces: 5,
+      ratings: 4,
       images: "images/boardgames.jpg",
     },
     {
@@ -21,6 +23,7 @@ let lessons =  [
       location: "British Colombia",
       price: 180,
       spaces: 5,
+      ratings: 3,
       images: "images/chess.jpg",
     },
     {
@@ -29,6 +32,7 @@ let lessons =  [
       location: "Bordeaux",
       price: 200,
       spaces: 5,
+      ratings: 4,
       images: "images/choir.jpg",
     },
     {
@@ -37,6 +41,7 @@ let lessons =  [
       location: "London",
       price: 350,
       spaces: 5,
+      ratings: 4,
       images: "images/english.jpg",
     },
     {
@@ -45,6 +50,7 @@ let lessons =  [
       location: "New York",
       price: 325,
       spaces: 5,
+      ratings: 5,
       images: "images/film.jpg",
     },
     {
@@ -53,6 +59,7 @@ let lessons =  [
       location: "Lyon",
       price: 80,
       spaces: 5,
+      ratings: 3,
       images: "images/french.jpg",
     },
     {
@@ -61,6 +68,7 @@ let lessons =  [
       location: "Hong Kong",
       price: 550,
       spaces: 5,
+      ratings: 5,
       images: "images/gymnastics.jpg",
     },
     {
@@ -69,6 +77,7 @@ let lessons =  [
       location: "Nairobi",
       price: 245,
       spaces: 5,
+      ratings: 2,
       images: "images/mathematics.jpg",
     },
     {
@@ -77,31 +86,9 @@ let lessons =  [
       location: "Kilifi",
       price: 600,
       spaces: 5,
+      ratings: 5,
       images: "images/swimming.jpg",
     },
   ];
-
-  //data to keep track of information;
-  let order = {
-    firstName: "",
-    lastName: "",
-    address: "",
-    city: "",
-    state: "",
-  };
-  
-  //data to keep track of the states.
-  let states = {
-    KLN: "Koln",
-    MAN: "Manchester",
-    BC: "British Colombia",
-    BOR: "Bordeaux",
-    LON: "London",
-    NY: "New York",
-    LY: "Lyon",
-    HK: "Hong Kong",
-    NAI: "Nairobi",
-    KI: "Kilifi",
-  };
 
   
