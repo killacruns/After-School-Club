@@ -28,12 +28,12 @@ let lessons =  [
     },
     {
       id: 4,
-      subject: "Choir",
-      location: "Bordeaux",
-      price: 200,
+      subject: "Chess",
+      location: "British Colombia",
+      price: 180,
       spaces: 5,
-      ratings: 4,
-      images: "images/choir.jpg",
+      ratings: 3,
+      images: "images/chess.jpg",
     },
     {
       id: 5,
