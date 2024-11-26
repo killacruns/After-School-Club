@@ -25,7 +25,7 @@
             class="cart-button"
           >
             {{ cartItemCount }}
-            <span><i class="fa fa-cart-plus"></i> Cart</span>
+            <span><i class="fa fa-cart-plus" aria-hidden="true"></i> Cart</span>
           </button>
           <button
             v-else
@@ -59,7 +59,7 @@
             placeholder="Search for lessons..."
             v-model="searchQuery"
           />
-          <button class="search-button">Search</button>
+          <button class="search-button" aria-label="Search">Search</button>
         </div>
       </div>
 
@@ -70,15 +70,15 @@
           v-for="(lesson, index) in filterItems"
           :key="index"
         >
-          <img :src="lesson.image" alt="lesson.image" class="lesson-image" />
+          <img :src="lesson.images" :alt="lesson.subject" class="lesson-image" />
           <p class="lesson-title">{{ lesson.subject }}</p>
           <p>Location: {{ lesson.location }}</p>
           <p>Price: ${{ lesson.price }}</p>
           <p>Spaces: {{ lesson.spaces }}</p>
           <p>
             Rating:
-            <span v-for="rate in lesson.ratings">★</span>
-            <span v-for="rate in 5 - lesson.ratings">☆</span>
+            <span v-for="rate in lesson.ratings" :key="rate">★</span>
+            <span v-for="rate in 5 - lesson.ratings" :key="rate + 5">☆</span>
           </p>
           <button
             v-if="lesson.spaces > 0"
@@ -87,23 +87,85 @@
           >
             Add to Cart
           </button>
-          <button class="disabled-button" disabled v-else>
+           <button class="disabled-button" v-else>
             No spaces left
           </button>
         </div>
       </div>
 
       <!-- Cart Section -->
-      <div class="cart-container" v-if="!showProduct">
-        <h1>Your Cart</h1>
-        <div v-for="(item, index) in cart" :key="index" class="cart-item">
-          <p><strong>{{ item.subject }}</strong></p>
-          <p>Price: ${{ item.price }}</p>
-          <p>Quantity: {{ item.quantity }}</p>
-          <button v-on:click="removeFromCart(index)">Remove</button>
+     <!-- Cart Section -->
+<div v-else>
+  <h1 class="text-center mt-1 font-bold text-xl">Cart</h1>
+  <div class="cart-container">
+    <!-- Loop through Cart Items -->
+    <div v-for="(cartItem, index) in cart" :key="index" class="lesson-card">
+    
+      <img :src="cartItem.images" :alt="cartItem.subject" />
+      <div class="lesson-details">
+        <p>{{ cartItem.subject }}</p>
+        <p>Location: {{ cartItem.location }}</p>
+        <p>Price: ${{ cartItem.price }}</p>
+        <p>Available Spaces: {{ cartItem.spaces }}</p>
+        <div class="remove-button-container">
+          <button
+            v-on:click="removeFromCart(index)"
+            :aria-label="'Remove ' + cartItem.subject + ' from cart'"
+          >
+            <i class="fa fa-times" aria-hidden="true"></i> Remove
+          </button>
         </div>
-        <p><strong>Total: ${{ total }}</strong></p>
-        <button v-on:click="showProduct = true">Back to Lessons</button>
+      </div>
+    </div>
+  </div>
+  <form @submit.prevent="handleSubmit" class="form-container">
+    <div>
+      <label for="firstName">First Name</label>
+      <input type="text" id="firstName" v-model="order.firstName" required />
+    </div>
+    <div>
+      <label for="lastName">Last Name</label>
+      <input type="text" id="lastName" v-model="order.lastName" required />
+    </div>
+    <div>
+      <label for="address">Address</label>
+      <input type="text" id="address" v-model="order.address" required />
+    </div>
+    <div>
+      <label for="city">City</label>
+      <input type="text" id="city" v-model="order.city" required />
+    </div>
+    <div>
+      <label for="state">State</label>
+      <select id="state" v-model="order.state" required>
+        <option disabled value="">Select your state</option>
+        <option v-for="(state, key) in states" :value="state" :key="key">{{ key }}</option>
+      </select>
+    </div>
+    <button type="submit">Submit Order</button>
+  </form>
+</div>
+<!-- Order Summary Section -->
+<div v-if="showSummary" class="order-summary-container">
+  <h1 class="text-center">Order Summary</h1>
+  <div class="order-summary">
+    <h2>Customer Details</h2>
+    <p><strong>Name:</strong> {{ order.firstName }} {{ order.lastName }}</p>
+    <p><strong>Address:</strong> {{ order.address }}, {{ order.city }}, {{ order.state }}</p>
+    <h2>Cart Items</h2>
+    <ul>
+      <li v-for="(item, index) in cart" :key="index">
+        <p><strong>{{ item.subject }}</strong></p>
+        <p>Location: {{ item.location }}</p>
+        <p>Price: ${{ item.price }}</p>
+      </li>
+    </ul>
+    <h2>Total Price</h2>
+    <p><strong>${{ totalPrice }}</strong></p>
+    <button class="back-button" v-on:click="resetOrder">Back to Products</button>
+  </div>
+</div>
+
       </div>
     </div>
 
@@ -111,4 +173,3 @@
     <script src="scripts/app.js"></script>
   </body>
 </html>
-

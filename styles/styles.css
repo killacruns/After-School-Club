@@ -179,4 +179,212 @@ body {
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     }
   }
-  
+  /* Cart Page Styles */
+.cart-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.cart-container .lesson-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.cart-container .lesson-card img {
+  width: 120px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.lesson-details {
+  flex-grow: 1;
+  margin-left: 15px;
+}
+
+.lesson-details p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.lesson-details p:first-child {
+  font-weight: bold;
+  color: #333;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+}
+
+.quantity-controls button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  margin: 0 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.quantity-controls button:disabled {
+  background-color: #dcdcdc;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.quantity-controls button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.quantity-controls p {
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+  font-weight: bold;
+}
+
+.remove-button-container button {
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.remove-button-container button:hover {
+  background-color: #c82333;
+}
+
+/* Form Styles */
+.form-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-container div {
+  margin-bottom: 15px;
+}
+
+.form-container label {
+  display: block;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.form-container input,
+.form-container select {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.form-container button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.form-container button:hover {
+  background-color: #218838;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .cart-container .lesson-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .cart-container .lesson-card img {
+    margin-bottom: 10px;
+  }
+
+  .lesson-details {
+    margin-left: 0;
+  }
+
+  .quantity-controls {
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .form-container {
+    padding: 15px;
+  }
+}.order-summary-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.order-summary h1,
+.order-summary h2 {
+  text-align: center;
+  color: #007bff;
+}
+
+.order-summary p {
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 5px 0;
+}
+
+.order-summary ul {
+  list-style: none;
+  padding: 0;
+}
+
+.order-summary ul li {
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.back-button {
+  display: block;
+  background-color: #28a745;
+  color: #fff;
+  padding: 10px 20px;
+  margin: 20px auto;
+  text-align: center;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.back-button:hover {
+  background-color: #218838;
+}

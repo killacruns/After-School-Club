@@ -1,70 +1,118 @@
-new Vue({
+const app = new Vue({
     el: "#app",
     data: {
-      showProduct: true,
-      sortOrder: "ascending",
-      sortCriteria: "name",
+      lessons: [], // This will be loaded from lessons.js
+      cart: [], // Contains items added to the cart
       searchQuery: "",
-      lessons: lessons, // Assuming 'lessons' is an array of lesson objects
-      cart: [], // The shopping cart
+      sortCriteria: "name",
+      sortOrder: "ascending",
+      showProduct: true, // Determines if product page is displayed
+      showSummary: false, // Determines if order summary is displayed
+      order: {
+        firstName: "",
+        lastName: "",
+        address: "",
+        city: "",
+        state: "",
+        method: "",
+      },
+      states: {
+        KN: "Koln",
+        MAN: "Manchester",
+        BC: "British Colombia",
+        VN: "Venice",
+        LDN: "London",
+        NY: "New York",
+        LYN: "Lyon",
+        HK: "Hong Kong",
+        NRB: "Nairobi",
+        KLF: "Kilifi",
+      },
+    },
+    computed: {
+      // Filter lessons based on search and sorting
+      filterItems() {
+        let filteredLessons = this.lessons;
+  
+        // Search filter
+        if (this.searchQuery) {
+          filteredLessons = filteredLessons.filter((lesson) =>
+            lesson.subject.toLowerCase().includes(this.searchQuery.toLowerCase())
+          );
+        }
+  
+        // Sorting
+        if (this.sortCriteria) {
+          filteredLessons.sort((a, b) => {
+            const fieldA = a[this.sortCriteria];
+            const fieldB = b[this.sortCriteria];
+            if (this.sortOrder === "ascending") {
+              return fieldA > fieldB ? 1 : -1;
+            } else {
+              return fieldA < fieldB ? 1 : -1;
+            }
+          });
+        }
+  
+        return filteredLessons;
+      },
+      isCartEmpty() {
+        return this.cart.length === 0;
+      },
+      cartItemCount() {
+        return this.cart.length;
+      },
+      totalPrice() {
+        return this.cart.reduce((total, item) => total + item.price, 0).toFixed(2);
+      },
     },
     methods: {
       addToCart(index) {
         const lesson = this.lessons[index];
         if (lesson.spaces > 0) {
-          // Find if the item is already in the cart
-          const cartItem = this.cart.find((item) => item.id === lesson.id);
-          if (cartItem) {
-            cartItem.quantity++;
-          } else {
-            // If it's not in the cart, add it
-            this.cart.push({ ...lesson, quantity: 1 });
-          }
-          // Reduce the number of spaces available in the lesson
           lesson.spaces--;
-        } else {
-          alert("No spaces left for this lesson.");
+          this.cart.push({ ...lesson, quantity: 1 });
         }
       },
       removeFromCart(index) {
-        // Remove the item from the cart by index
         const cartItem = this.cart[index];
-        cartItem.quantity--;
-        if (cartItem.quantity === 0) {
-          this.cart.splice(index, 1); // Remove the item completely from the cart
+        const lessonIndex = this.lessons.findIndex(
+          (lesson) => lesson.subject === cartItem.subject
+        );
+        if (lessonIndex >= 0) {
+          this.lessons[lessonIndex].spaces += this.cart[index].quantity;
         }
-        // Increase the spaces available for that lesson
-        const lesson = this.lessons.find(lesson => lesson.id === cartItem.id);
-        if (lesson) {
-          lesson.spaces++;
-        }
+        this.cart.splice(index, 1);
+      },
+      clearCart() {
+        this.cart = [];
       },
       showCheckOut() {
-        this.showProduct = false; // Toggle to the cart view
+        this.showProduct = false; // Switch to cart view
       },
-      backToLessons() {
-        this.showProduct = true; // Toggle back to the lessons view
+      resetOrder() {
+        // Reset order and return to product view
+        this.cart = [];
+        this.order = {
+          firstName: "",
+          lastName: "",
+          address: "",
+          city: "",
+          state: "",
+          method: "",
+        };
+        this.showProduct = true;
+        this.showSummary = false;
+      },
+      handleSubmit() {
+        // Display the order summary and hide the cart
+        this.showSummary = true;
+        this.showProduct = false;
       },
     },
-    computed: {
-      cartItemCount() {
-        // Total items in the cart
-        return this.cart.reduce((total, item) => total + item.quantity, 0);
-      },
-      isCartEmpty() {
-        // Check if the cart is empty
-        return this.cart.length === 0;
-      },
-      total() {
-        // Calculate the total price of all items in the cart
-        return this.cart.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
-      },
-      filterItems() {
-        const query = this.searchQuery.toLowerCase();
-        return this.lessons.filter((lesson) =>
-          lesson.subject.toLowerCase().includes(query)
-        );
-      },
+    mounted() {
+      // Load lessons from lessons.js
+      this.lessons = lessons;
     },
   });
   
