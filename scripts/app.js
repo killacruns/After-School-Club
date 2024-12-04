@@ -1,14 +1,14 @@
 const app = new Vue({
   el: "#app",
   data: {
-    lessons: [], // This will be loaded from the lessons API
-    cart: [], // Contains items added to the cart
-    searchQuery: "",
-    sortCriteria: "name",
-    sortOrder: "ascending",
-    showProduct: true, // Determines if the product page is displayed
-    showSummary: false, // Determines if order summary is displayed
-    order: {
+    lessons: [], // Loaded from the backend
+    cart: [], // Items added to the cart
+    searchQuery: "", // User search input
+    sortCriteria: "name", // Criteria to sort lessons
+    sortOrder: "ascending", // Order of sorting (ascending/descending)
+    showProduct: true, // Whether to show the product page
+    showSummary: false, // Whether to show the order summary
+    order: { // User order details
       firstName: "",
       lastName: "",
       address: "",
@@ -16,7 +16,7 @@ const app = new Vue({
       state: "",
       method: "",
     },
-    states: {
+    states: { // List of states for the dropdown
       KN: "Koln",
       MAN: "Manchester",
       BC: "British Columbia",
@@ -30,95 +30,110 @@ const app = new Vue({
     },
   },
   computed: {
-    // Filter lessons based on search and sorting
+    // Filters lessons based on search query and sorts them
     filterItems() {
+      console.log("Lessons before filtering:", this.lessons); // Debugging line
+    
       let filteredLessons = this.lessons;
-
-      // Search filter
       if (this.searchQuery) {
         filteredLessons = filteredLessons.filter((lesson) =>
           lesson.subject.toLowerCase().includes(this.searchQuery.toLowerCase())
         );
       }
-
-      // Sorting
       if (this.sortCriteria) {
         filteredLessons.sort((a, b) => {
           const fieldA = a[this.sortCriteria];
           const fieldB = b[this.sortCriteria];
-          if (this.sortOrder === "ascending") {
-            return fieldA > fieldB ? 1 : -1;
-          } else {
-            return fieldA < fieldB ? 1 : -1;
+    
+          if (typeof fieldA === "string" && typeof fieldB === "string") {
+            return this.sortOrder === "ascending"
+              ? fieldA.localeCompare(fieldB)
+              : fieldB.localeCompare(fieldA);
           }
+          return this.sortOrder === "ascending" ? fieldA - fieldB : fieldB - fieldA;
         });
       }
-
+    
+      console.log("Filtered Lessons:", filteredLessons); // Debugging line
       return filteredLessons;
+      
     },
+    
+    // Checks if the cart is empty
     isCartEmpty() {
       return this.cart.length === 0;
     },
+    // Calculates the total number of items in the cart
     cartItemCount() {
-      return this.cart.length;
+      return this.cart.reduce((total, item) => total + item.quantity, 0);
     },
+    // Calculates the total price of items in the cart
     totalPrice() {
-      return this.cart.reduce((total, item) => total + item.price, 0).toFixed(2);
+      return this.cart.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
     },
   },
   methods: {
-    // Fetch lessons from the API
-    fetchLessons() {
-      fetch('http://localhost:3000/api/lessons')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then(data => {
-          this.lessons = data; // Update lessons with the fetched data
-        })
-        .catch(err => {
-          console.error("Failed to fetch lessons:", err);
-        });
-    },
-
-    // Add lesson to the cart and decrease available spaces
+    // Adds a lesson to the cart and updates available spaces
     addToCart(index) {
       const lesson = this.lessons[index];
       if (lesson.spaces > 0) {
-        lesson.spaces--; // Decrease the space count when added to the cart
-        this.cart.push({ ...lesson, quantity: 1 });
+        const cartItem = this.cart.find((item) => item.id === lesson.id);
+        if (cartItem) {
+          cartItem.quantity++;
+        } else {
+          this.cart.push({ ...lesson, quantity: 1 });
+        }
+        lesson.spaces--; // Reduce available spaces
+        this.updateAvailableSpace(lesson.id, lesson.spaces); // Update backend
       }
     },
-
-    // Remove item from the cart and restore space
+    // Method to handle the search input with debounce
+    handleSearchInput() {
+      clearTimeout(this.debounceTimer); // Clear any previous debounce timer
+      this.debounceTimer = setTimeout(() => {
+          this.handleSearch(); // Call search after debounce delay
+      }, 300); // 300ms delay
+  },
+  // Method to search for courses
+  searchCourses() {
+      console.log('Current search query:', this.searchQuery);
+      const encodedQuery = encodeURIComponent(this.searchQuery.trim());
+      fetch(`/api/search?q=${encodedQuery}`)
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('Failed to fetch search results');
+              }
+              return response.json();
+          })
+          .then(data => {
+              this.courses = data;
+          })
+          .catch(error => {
+              console.error('Error fetching search results:', error);
+          });
+  },
+    // Removes an item from the cart and restores spaces
     removeFromCart(index) {
       const cartItem = this.cart[index];
-      const lessonIndex = this.lessons.findIndex(
-        (lesson) => lesson.subject === cartItem.subject
-      );
+      const lessonIndex = this.lessons.findIndex((lesson) => lesson.id === cartItem.id);
       if (lessonIndex >= 0) {
-        this.lessons[lessonIndex].spaces += this.cart[index].quantity; // Restore spaces on removal
+        this.lessons[lessonIndex].spaces += this.cart[index].quantity; // Restore spaces
+        this.updateAvailableSpace(cartItem.id, this.lessons[lessonIndex].spaces); // Update backend
       }
       this.cart.splice(index, 1); // Remove item from cart
     },
-
-    // Clear the cart
+    // Clears all items from the cart
     clearCart() {
       this.cart = [];
     },
-
-    // Show the checkout page
+    // Switches to the checkout view
     showCheckOut() {
-      this.showProduct = false; // Hide the product page and show cart
+      this.showProduct = false;
     },
-
-    // Reset the order and return to the product view
+    // Resets the order form and returns to the product view
     resetOrder() {
-      this.cart = [];
-      this.order = {
+      this.cart = []; // Clear the cart
+      this.order = { // Reset order details
         firstName: "",
         lastName: "",
         address: "",
@@ -126,75 +141,79 @@ const app = new Vue({
         state: "",
         method: "",
       };
-      this.showProduct = true;
-      this.showSummary = false;
+      this.showProduct = true; // Show product page
+      this.showSummary = false; // Hide summary
     },
-
-    // Handle form submission and show the order summary
+    // Submits the order and shows the summary view
     handleSubmit() {
-      this.showSummary = true;
-      this.showProduct = false;
-    },
-
-    // Post an order to the API and clear cart if successful
-    placeOrder(order) {
-      fetch('http://localhost:3000/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(order),
+      // Save the order to the backend
+      fetch("http://localhost:8000/collection/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer: this.order,
+          cart: this.cart,
+          totalPrice: this.totalPrice,
+        }),
       })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error("Failed to place the order");
-          }
+        .then((response) => {
+          if (!response.ok) throw new Error("Failed to save the order");
           return response.json();
         })
-        .then(data => {
-          this.cart = []; // Clear the cart after successful order
-          this.checkoutData = {
-            name: '',
-            address: '',
-            phone: '',
-            city: '',
-            state: '',
-          };
-          this.isCheckoutEnabled = false;
-          this.showCourses = true;
-          alert(`Order placed successfully! Order ID: ${data.orderId}`);
+        .then((data) => {
+          console.log("Order saved:", data);
+          this.showSummary = true; // Show summary
+          this.showProduct = false; // Hide product view
         })
-        .catch(err => {
-          console.error("Error placing order:", err);
-          alert("Failed to place the order. Please try again.");
-        });
+        .catch((error) => console.error("Error saving order:", error));
     },
-
-    // Update available space for a lesson
-    updateAvailableSpace(courseId, updatedSpaces) {
-      fetch(`http://localhost:3000/api/lessons/${courseId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ availableSpaces: updatedSpaces }),
+    // Updates the available spaces for a lesson on the backend
+    updateAvailableSpace(id, spaces) {
+      fetch(`http://localhost:8000/collection/products/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ spaces }),
       })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error("Failed to update lesson space");
-          }
+        .then((response) => {
+          if (!response.ok) throw new Error("Failed to update available spaces");
           return response.json();
         })
-        .then(data => {
-          console.log("Lesson space updated successfully:", data);
-        })
-        .catch(err => {
-          console.error("Error updating lesson space:", err);
-        });
+        .then((data) => console.log("Updated spaces:", data))
+        .catch((error) => console.error("Error updating spaces:", error));
     },
   },
   mounted() {
-    // Fetch lessons when the component is mounted
-    this.fetchLessons();
+    // Fetches all lessons from the backend when the app loads
+    fetch("http://localhost:8000/collection/products")
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to fetch lessons");
+        return response.json();
+      })
+      .then((data) => {
+        this.lessons = data; // Load lessons into the app
+      })
+      .catch((error) => console.error("Error fetching lessons:", error));
   },
+  handleSubmit() {
+    console.log("Submit button clicked");  // Log to see if this is triggered
+    fetch("http://localhost:8000/collection/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        customer: this.order,
+        cart: this.cart,
+        totalPrice: this.totalPrice,
+      }),
+    })
+    .then((response) => {
+      if (!response.ok) throw new Error("Failed to save the order");
+      return response.json();
+    })
+    .then((data) => {
+      console.log("Order saved:", data);
+      this.showSummary = true;
+      this.showProduct = false;
+    })
+    .catch((error) => console.error("Error saving order:", error));
+  }
 });
