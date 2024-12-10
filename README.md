@@ -11,3 +11,5 @@ Lecturer: Dr. Chinnu Mary George
 Link to the GitHub Repository - Frontend https://github.com/killacruns/After-School-Club
 
 Link to the GitHub Repository -Backend https://github.com/killacruns/fullstack_backend
+
+Link to Github pages https://killacruns.github.io/After-School-Club/
